@@ -28,7 +28,7 @@ def main() -> None:
         memory_file=Path("memory/memory.md"),
         runs_file=Path("memory/runs.jsonl"),
     )
-    registry = SkillRegistry.from_skills_directory(Path("skills"))
+    registry = SkillRegistry.from_config(Path("config/skills.example.yaml"))
     result = run_pipeline(Path(args.pipeline), registry=registry, memory_store=memory, logger=logger)
     logger.info("Pipeline finished with %d step(s)", len(result.get("steps", [])))
 

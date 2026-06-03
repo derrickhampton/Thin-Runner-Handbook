@@ -15,7 +15,7 @@ def test_run_hello_pipeline(tmp_path: Path) -> None:
         memory_file=tmp_path / "memory.md",
         runs_file=tmp_path / "runs.jsonl",
     )
-    registry = SkillRegistry.from_skills_directory(Path("skills"))
+    registry = SkillRegistry.from_config(Path("config/skills.example.yaml"))
     result = run_pipeline(
         Path("pipelines/hello_pipeline.yaml"),
         registry=registry,
