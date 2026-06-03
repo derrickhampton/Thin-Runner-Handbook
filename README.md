@@ -14,17 +14,22 @@ inspect, and run without hidden setup steps.
 
 ## Quick start
 
-1. Create and activate a virtual environment.
-2. Install dependencies:
+1. Create the local development environment:
 
 ```bash
-pip install -e .[dev]
+make setup
 ```
 
-1. Run a smoke test:
+1. Run tests:
 
 ```bash
-./scripts/smoke_test.sh
+make test
+```
+
+1. Run the smoke flow (pipeline + tests):
+
+```bash
+make smoke
 ```
 
 ## Repository layout
