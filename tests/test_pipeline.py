@@ -1,6 +1,10 @@
 from pathlib import Path
 
 from orchestrator.pipeline import PipelineRunner
+from orchestrator.logging_utils import RunLogger
+from orchestrator.memory import MemoryStore
+from orchestrator.registry import SkillRegistry
+from orchestrator.runner import ThinRunner
 
 
 class _Result:
@@ -118,3 +122,19 @@ steps:
     assert len(result["steps"]) == 1
     assert result["steps"][0]["status"] == "failed"
     assert runner.calls == ["hello_world"]
+
+
+def test_hello_pipeline_runs_real_runner(tmp_path: Path) -> None:
+    memory = MemoryStore(
+        jsonl_path=tmp_path / "runs.jsonl",
+        markdown_path=tmp_path / "memory.md",
+    )
+    run_logger = RunLogger(log_dir=tmp_path / "logs")
+    registry = SkillRegistry.from_config(Path("config/skills.example.yaml"))
+    runner = ThinRunner(registry=registry, memory_store=memory, run_logger=run_logger)
+
+    result = PipelineRunner(runner=runner).run_pipeline("pipelines/hello_pipeline.yaml")
+
+    assert result["status"] == "success"
+    assert result["steps"]
+    assert result["steps"][0]["output"]["status"] == "success"

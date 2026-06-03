@@ -113,3 +113,20 @@ def test_thin_runner_run_skill_failure_has_error_details(tmp_path: Path) -> None
     logged = json.loads(log_path.read_text(encoding="utf-8"))
     assert logged["status"] == "failed"
     assert "skill blew up" in (logged.get("error") or "")
+
+
+def test_runner_executes_hello_world_real_registry(tmp_path: Path) -> None:
+    memory = MemoryStore(
+        jsonl_path=tmp_path / "runs.jsonl",
+        markdown_path=tmp_path / "memory.md",
+    )
+    run_logger = RunLogger(log_dir=tmp_path / "logs")
+    registry = SkillRegistry.from_config(Path("config/skills.example.yaml"))
+    runner = ThinRunner(registry=registry, memory_store=memory, run_logger=run_logger)
+
+    result = runner.run_skill("hello_world", {"name": "Test"})
+    data = result.to_dict()
+
+    assert data["status"] == "success"
+    assert data["output"]["message"] == "Hello, Test!"
+    assert data["duration_ms"] >= 0
