@@ -1,5 +1,5 @@
 """Thin Runner orchestrator package."""
 
-from .runner import run_pipeline
+from .runner import RunResult, ThinRunner, run_pipeline
 
-__all__ = ["run_pipeline"]
+__all__ = ["RunResult", "ThinRunner", "run_pipeline"]

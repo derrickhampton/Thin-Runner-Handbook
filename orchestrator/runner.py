@@ -1,11 +1,71 @@
-"""Pipeline runner implementation."""
+"""Thin Runner core orchestration and pipeline compatibility helpers."""
 
 from __future__ import annotations
 
+import time
+import traceback
+from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 from .pipeline import load_pipeline
+from .registry import SkillRegistry
+
+
+@dataclass
+class RunResult:
+    run_id: str
+    skill: str
+    status: str
+    started_at: str
+    duration_ms: int
+    input: dict[str, Any]
+    output: dict[str, Any] | None = None
+    error: str | None = None
+    traceback: str | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+class ThinRunner:
+    def __init__(self, registry: SkillRegistry | None = None) -> None:
+        self.registry = registry or SkillRegistry()
+
+    def run_skill(self, skill_name: str, input_data: dict[str, Any] | None = None) -> RunResult:
+        input_data = input_data or {}
+        run_id = str(uuid4())
+        started_at = datetime.now(timezone.utc).isoformat()
+        start = time.perf_counter()
+
+        try:
+            skill_fn = self.registry.get_skill_callable(skill_name)
+            output = skill_fn(input_data)
+            duration_ms = int((time.perf_counter() - start) * 1000)
+
+            return RunResult(
+                run_id=run_id,
+                skill=skill_name,
+                status="success",
+                started_at=started_at,
+                duration_ms=duration_ms,
+                input=input_data,
+                output=output,
+            )
+        except Exception as exc:
+            duration_ms = int((time.perf_counter() - start) * 1000)
+            return RunResult(
+                run_id=run_id,
+                skill=skill_name,
+                status="failed",
+                started_at=started_at,
+                duration_ms=duration_ms,
+                input=input_data,
+                error=str(exc),
+                traceback=traceback.format_exc(),
+            )
 
 
 def run_pipeline(pipeline_path: Path, registry, memory_store, logger) -> dict[str, Any]:
