@@ -9,7 +9,7 @@ setup:
 	$(PIP) install -e .[dev]
 
 run:
-	$(PYTHON) -m orchestrator.cli --pipeline pipelines/hello_pipeline.yaml
+	.venv/bin/thin-runner run-skill hello_world --input skills/hello_world/input.example.json
 
 smoke: run test
 

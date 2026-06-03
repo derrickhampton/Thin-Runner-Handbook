@@ -1,37 +1,50 @@
-"""Command-line entrypoint for running a Thin Runner pipeline."""
+"""Command-line interface for Thin Runner."""
 
 from __future__ import annotations
 
 import argparse
+import json
+import sys
 from pathlib import Path
+from typing import Any
 
-from .logging_utils import create_logger
-from .memory import FileMemoryStore
-from .registry import SkillRegistry
-from .runner import run_pipeline
+from .runner import ThinRunner
 
 
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run a Thin Runner pipeline")
-    parser.add_argument(
-        "--pipeline",
-        default="pipelines/hello_pipeline.yaml",
-        help="Path to a pipeline YAML file",
-    )
-    return parser.parse_args()
+def _load_input(args: argparse.Namespace) -> dict[str, Any]:
+    if args.json_input:
+        return json.loads(args.json_input)
+
+    if args.input:
+        return json.loads(Path(args.input).read_text(encoding="utf-8"))
+
+    return {}
 
 
-def main() -> None:
-    args = parse_args()
-    logger = create_logger("thin_runner")
-    memory = FileMemoryStore(
-        memory_file=Path("memory/memory.md"),
-        runs_file=Path("memory/runs.jsonl"),
-    )
-    registry = SkillRegistry.from_config(Path("config/skills.example.yaml"))
-    result = run_pipeline(Path(args.pipeline), registry=registry, memory_store=memory, logger=logger)
-    logger.info("Pipeline finished with %d step(s)", len(result.get("steps", [])))
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Thin Runner Handbook CLI")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    run_skill = subparsers.add_parser("run-skill", help="Run a skill by name")
+    run_skill.add_argument("skill_name")
+    run_skill.add_argument("--input", help="Path to JSON input file")
+    run_skill.add_argument("--json", dest="json_input", help="Inline JSON input")
+
+    args = parser.parse_args(argv)
+
+    if args.command == "run-skill":
+        try:
+            input_data = _load_input(args)
+            result = ThinRunner().run_skill(args.skill_name, input_data)
+            print(json.dumps(result.to_dict(), indent=2))
+            return 0 if result.status == "success" else 1
+        except Exception as exc:
+            print(json.dumps({"status": "failed", "error": str(exc)}, indent=2), file=sys.stderr)
+            return 1
+
+    parser.print_help()
+    return 1
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main(sys.argv[1:]))
