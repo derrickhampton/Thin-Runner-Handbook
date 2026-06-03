@@ -24,8 +24,10 @@ async function loadHealth() {
   try {
     const data = await fetchJson("/api/health");
     apiStatus.textContent = `API: ${data.status}`;
+    apiStatus.dataset.status = data.status === "ok" ? "ok" : "error";
   } catch (err) {
     apiStatus.textContent = `API: error (${err.message})`;
+    apiStatus.dataset.status = "error";
   }
 }
 
@@ -71,10 +73,13 @@ async function runSkill() {
     });
     skillResult.textContent = JSON.stringify(result, null, 2);
     lastRunStatus.textContent = `Last run: ${result.status} (${result.skill})`;
+    lastRunStatus.dataset.status = result.status;
     await loadRuns();
     await loadMemory();
   } catch (err) {
     skillResult.textContent = `Run failed: ${err.message}`;
+    lastRunStatus.textContent = "Last run: failed";
+    lastRunStatus.dataset.status = "failed";
   }
 }
 
@@ -86,6 +91,7 @@ async function loadRuns() {
   for (const run of state.runs) {
     const btn = document.createElement("button");
     btn.className = "run-item";
+    btn.dataset.status = run.status || "unknown";
     btn.textContent = `${run.run_id} | ${run.skill} | ${run.status} | ${run.duration_ms}ms`;
     btn.addEventListener("click", () => loadRunLog(run.run_id));
     runsList.appendChild(btn);
