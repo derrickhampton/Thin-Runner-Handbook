@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
+from .memory import MemoryStore
 from .pipeline import load_pipeline
 from .registry import SkillRegistry
 
@@ -31,8 +32,13 @@ class RunResult:
 
 
 class ThinRunner:
-    def __init__(self, registry: SkillRegistry | None = None) -> None:
+    def __init__(
+        self,
+        registry: SkillRegistry | None = None,
+        memory_store: MemoryStore | None = None,
+    ) -> None:
         self.registry = registry or SkillRegistry()
+        self.memory_store = memory_store or MemoryStore()
 
     def run_skill(self, skill_name: str, input_data: dict[str, Any] | None = None) -> RunResult:
         input_data = input_data or {}
@@ -44,8 +50,7 @@ class ThinRunner:
             skill_fn = self.registry.get_skill_callable(skill_name)
             output = skill_fn(input_data)
             duration_ms = int((time.perf_counter() - start) * 1000)
-
-            return RunResult(
+            result = RunResult(
                 run_id=run_id,
                 skill=skill_name,
                 status="success",
@@ -54,9 +59,11 @@ class ThinRunner:
                 input=input_data,
                 output=output,
             )
+            self.memory_store.append_run(result.to_dict())
+            return result
         except Exception as exc:
             duration_ms = int((time.perf_counter() - start) * 1000)
-            return RunResult(
+            result = RunResult(
                 run_id=run_id,
                 skill=skill_name,
                 status="failed",
@@ -66,6 +73,8 @@ class ThinRunner:
                 error=str(exc),
                 traceback=traceback.format_exc(),
             )
+            self.memory_store.append_run(result.to_dict())
+            return result
 
 
 def run_pipeline(pipeline_path: Path, registry, memory_store, logger) -> dict[str, Any]:
