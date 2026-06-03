@@ -14,21 +14,39 @@ inspect, and run without hidden setup steps.
 
 ## Quick start
 
-1. Create the local development environment:
+1. macOS setup:
 
 ```bash
-make setup
+./scripts/setup_dev.sh
+source .venv/bin/activate
+```
+
+1. Ubuntu setup:
+
+```bash
+sudo apt update
+sudo apt install -y python3 python3-venv
+./scripts/setup_dev.sh
+source .venv/bin/activate
+```
+
+1. Verify the CLI entrypoint:
+
+```bash
+thin-runner --help
 ```
 
 1. Run tests:
 
 ```bash
-make test
+pytest -q
 ```
 
-1. Run the smoke flow (pipeline + tests):
+1. Optional Makefile workflow:
 
 ```bash
+make setup
+make test
 make smoke
 ```
 
