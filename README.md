@@ -1,60 +1,88 @@
 # Thin Runner Handbook
 
-This repository is the base Thin Runner model for the Thin Runner Handbook.
+A small, transparent workflow executor for running predefined skills and
+pipelines with explicit inputs, visible outputs, logs, and file-based memory.
 
-The goal is to keep the workflow visible and inspectable:
+Website: https://ThinRunner.com
 
-- small, file-based skills
-- explicit pipeline orchestration
-- simple local memory
-- observable run logs
+## What is a Thin Runner?
 
-This first version is intentionally minimal. It is a working scaffold you can clone,
-inspect, and run without hidden setup steps.
+A Thin Runner runs the right skill at the right time with the right inputs,
+then records what happened.
 
-## Quick start
+It is not a heavyweight autonomous agent. It does not keep a hidden reasoning
+loop running in the background. It is intentionally boring: load config, run a
+skill or pipeline, capture output, write memory, write logs.
 
-1. macOS setup:
+## Base Flow
+
+```text
+CLI / cron / webhook / GitHub Action
+|
+v
+Thin Runner orchestrator
+|
+v
+Skill or pipeline
+|
+v
+Structured output
+|
+v
+Memory + logs
+```
+
+## Quickstart
 
 ```bash
-./scripts/setup_dev.sh
+git clone https://github.com/derrickhampton/Thin-Runner-Handbook.git
+cd Thin-Runner-Handbook
+bash scripts/setup_dev.sh
 source .venv/bin/activate
 ```
 
-1. Ubuntu setup:
+## Run the hello-world skill
+
+```bash
+thin-runner run-skill hello_world --json '{"name":"Thin Runner"}'
+```
+
+## Run the hello pipeline
+
+```bash
+thin-runner run-pipeline pipelines/hello_pipeline.yaml
+```
+
+## Inspect outputs
+
+```bash
+cat memory/runs.jsonl
+tail -n 40 memory/memory.md
+ls logs/
+```
+
+## Core Components
+
+| Path | Purpose |
+| --- | --- |
+| orchestrator/ | Thin Runner execution layer |
+| skills/ | Focused executable units |
+| pipelines/ | Ordered skill workflows |
+| memory/ | Human and machine-readable run history |
+| logs/ | Per-run structured JSON logs |
+| config/ | Explicit skill and runner configuration |
+| .github/workflows/ | CI smoke checks |
+
+## Extra setup notes
+
+If your system does not already include Python 3.11+ and `venv`, install them first.
+For Ubuntu:
 
 ```bash
 sudo apt update
 sudo apt install -y python3 python3-venv
-./scripts/setup_dev.sh
-source .venv/bin/activate
 ```
 
-1. Verify the CLI entrypoint:
+## Philosophy
 
-```bash
-thin-runner --help
-```
-
-1. Run tests:
-
-```bash
-pytest -q
-```
-
-1. Optional Makefile workflow:
-
-```bash
-make setup
-make test
-make smoke
-```
-
-## Repository layout
-
-- `orchestrator/` contains the thin runner core.
-- `skills/` contains skill implementations.
-- `pipelines/` contains YAML pipelines.
-- `memory/` tracks notes and run history.
-- `logs/` and `runs/` hold runtime outputs.
-- `tests/` contains baseline tests.
+Put the workflow in the center, not the agent.
