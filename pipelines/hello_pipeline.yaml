@@ -1,6 +1,7 @@
-name: hello-pipeline
+name: hello_pipeline
+description: Run the hello_world skill as the first Thin Runner pipeline.
 steps:
-  - name: hello_step
+  - name: say_hello
     skill: hello_world
     input:
-      name: Handbook
+      name: Thin Runner Pipeline

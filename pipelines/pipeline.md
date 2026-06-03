@@ -1,5 +1,25 @@
-# Pipelines
+# Pipeline: hello_pipeline
 
-Pipelines define ordered skill execution using YAML.
+## Purpose
 
-The `hello_pipeline.yaml` file is the starter example used by smoke tests.
+Prove that the Thin Runner can run a pipeline definition made of one or more
+skill steps.
+
+## Flow
+
+```text
+Input
+|
+v
+hello_world skill
+|
+v
+Pipeline output
+|
+v
+Memory + logs
+```
+
+## Command
+
+`thin-runner run-pipeline pipelines/hello_pipeline.yaml`

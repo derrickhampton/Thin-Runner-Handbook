@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from .pipeline import PipelineRunner
 from .runner import ThinRunner
 
 
@@ -30,6 +31,9 @@ def main(argv: list[str] | None = None) -> int:
     run_skill.add_argument("--input", help="Path to JSON input file")
     run_skill.add_argument("--json", dest="json_input", help="Inline JSON input")
 
+    run_pipeline = subparsers.add_parser("run-pipeline", help="Run a pipeline by YAML path")
+    run_pipeline.add_argument("pipeline_path")
+
     args = parser.parse_args(argv)
 
     if args.command == "run-skill":
@@ -38,6 +42,15 @@ def main(argv: list[str] | None = None) -> int:
             result = ThinRunner().run_skill(args.skill_name, input_data)
             print(json.dumps(result.to_dict(), indent=2))
             return 0 if result.status == "success" else 1
+        except Exception as exc:
+            print(json.dumps({"status": "failed", "error": str(exc)}, indent=2), file=sys.stderr)
+            return 1
+
+    if args.command == "run-pipeline":
+        try:
+            result = PipelineRunner().run_pipeline(args.pipeline_path)
+            print(json.dumps(result, indent=2))
+            return 0 if result.get("status") == "success" else 1
         except Exception as exc:
             print(json.dumps({"status": "failed", "error": str(exc)}, indent=2), file=sys.stderr)
             return 1

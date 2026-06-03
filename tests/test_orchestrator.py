@@ -47,9 +47,9 @@ def test_run_hello_pipeline(tmp_path: Path) -> None:
         logger=_Logger(),
     )
 
-    assert result["pipeline"] == "hello-pipeline"
+    assert result["pipeline"] == "hello_pipeline"
     assert len(result["steps"]) == 1
-    assert result["steps"][0]["output"]["message"] == "Hello, Handbook!"
+    assert result["steps"][0]["output"]["message"] == "Hello, Thin Runner Pipeline!"
 
 
 def test_thin_runner_run_skill_success(tmp_path: Path) -> None:
