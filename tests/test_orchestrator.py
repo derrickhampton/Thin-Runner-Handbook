@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+from orchestrator.logging_utils import RunLogger
 from orchestrator.memory import FileMemoryStore, MemoryStore
 from orchestrator.registry import SkillRegistry
 from orchestrator.runner import ThinRunner, run_pipeline
@@ -56,7 +57,8 @@ def test_thin_runner_run_skill_success(tmp_path: Path) -> None:
         jsonl_path=tmp_path / "runs.jsonl",
         markdown_path=tmp_path / "memory.md",
     )
-    runner = ThinRunner(registry=_SuccessRegistry(), memory_store=memory)
+    run_logger = RunLogger(log_dir=tmp_path / "logs")
+    runner = ThinRunner(registry=_SuccessRegistry(), memory_store=memory, run_logger=run_logger)
     result = runner.run_skill("hello_world", {"name": "Thin Runner"})
 
     assert result.status == "success"
@@ -74,6 +76,12 @@ def test_thin_runner_run_skill_success(tmp_path: Path) -> None:
     markdown = (tmp_path / "memory.md").read_text(encoding="utf-8")
     assert "## Run" in markdown
     assert "No runs recorded yet." not in markdown
+    log_path = tmp_path / "logs" / f"{result.run_id}.json"
+    assert log_path.exists()
+    logged = json.loads(log_path.read_text(encoding="utf-8"))
+    assert logged["status"] == "success"
+    assert logged["input"]["name"] == "Thin Runner"
+    assert "duration_ms" in logged
 
 
 def test_thin_runner_run_skill_failure_has_error_details(tmp_path: Path) -> None:
@@ -81,7 +89,8 @@ def test_thin_runner_run_skill_failure_has_error_details(tmp_path: Path) -> None
         jsonl_path=tmp_path / "runs.jsonl",
         markdown_path=tmp_path / "memory.md",
     )
-    runner = ThinRunner(registry=_FailureRegistry(), memory_store=memory)
+    run_logger = RunLogger(log_dir=tmp_path / "logs")
+    runner = ThinRunner(registry=_FailureRegistry(), memory_store=memory, run_logger=run_logger)
     result = runner.run_skill("hello_world", {"name": "Thin Runner"})
 
     assert result.status == "failed"
@@ -99,3 +108,8 @@ def test_thin_runner_run_skill_failure_has_error_details(tmp_path: Path) -> None
     assert "skill blew up" in (stored.get("error") or "")
     markdown = (tmp_path / "memory.md").read_text(encoding="utf-8")
     assert "- Status: `failed`" in markdown
+    log_path = tmp_path / "logs" / f"{result.run_id}.json"
+    assert log_path.exists()
+    logged = json.loads(log_path.read_text(encoding="utf-8"))
+    assert logged["status"] == "failed"
+    assert "skill blew up" in (logged.get("error") or "")

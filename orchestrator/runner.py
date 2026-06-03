@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
+from .logging_utils import RunLogger
 from .memory import MemoryStore
 from .pipeline import load_pipeline
 from .registry import SkillRegistry
@@ -36,9 +37,11 @@ class ThinRunner:
         self,
         registry: SkillRegistry | None = None,
         memory_store: MemoryStore | None = None,
+        run_logger: RunLogger | None = None,
     ) -> None:
         self.registry = registry or SkillRegistry()
         self.memory_store = memory_store or MemoryStore()
+        self.run_logger = run_logger or RunLogger()
 
     def run_skill(self, skill_name: str, input_data: dict[str, Any] | None = None) -> RunResult:
         input_data = input_data or {}
@@ -60,6 +63,7 @@ class ThinRunner:
                 output=output,
             )
             self.memory_store.append_run(result.to_dict())
+            self.run_logger.write_run_log(result.to_dict())
             return result
         except Exception as exc:
             duration_ms = int((time.perf_counter() - start) * 1000)
@@ -74,6 +78,7 @@ class ThinRunner:
                 traceback=traceback.format_exc(),
             )
             self.memory_store.append_run(result.to_dict())
+            self.run_logger.write_run_log(result.to_dict())
             return result
 
 

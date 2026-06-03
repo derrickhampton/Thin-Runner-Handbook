@@ -9,6 +9,7 @@ venv/
 
 # Runtime outputs
 logs/*.log
+logs/*.json
 runs/*.json
 runs/*.jsonl
 !logs/.gitkeep
