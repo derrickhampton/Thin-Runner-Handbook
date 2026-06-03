@@ -89,12 +89,24 @@ async function loadRuns() {
   runsList.innerHTML = "";
 
   for (const run of state.runs) {
+    const row = document.createElement("div");
+    row.className = "run-item-row";
+
     const btn = document.createElement("button");
     btn.className = "run-item";
     btn.dataset.status = run.status || "unknown";
     btn.textContent = `${run.run_id} | ${run.skill} | ${run.status} | ${run.duration_ms}ms`;
     btn.addEventListener("click", () => loadRunLog(run.run_id));
-    runsList.appendChild(btn);
+
+    const tip = document.createElement("span");
+    tip.className = "tooltip-trigger";
+    tip.tabIndex = 0;
+    tip.textContent = "?";
+    tip.dataset.tooltip = "Open the full structured log for this run id.";
+
+    row.appendChild(btn);
+    row.appendChild(tip);
+    runsList.appendChild(row);
   }
 }
 

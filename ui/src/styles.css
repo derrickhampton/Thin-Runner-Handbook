@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
 * {
   box-sizing: border-box;
 }
@@ -29,7 +31,7 @@
 
 body {
   margin: 0;
-  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", "Menlo", monospace;
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
   background: radial-gradient(circle at 8% 12%, rgba(88, 166, 255, 0.16), transparent 35%),
     radial-gradient(circle at 82% 20%, rgba(63, 185, 80, 0.16), transparent 38%),
     linear-gradient(160deg, var(--bg-base) 0%, #0b111d 50%, #0c141e 100%);
@@ -79,6 +81,27 @@ section {
   padding: 18px;
   box-shadow: var(--shadow-lg);
   backdrop-filter: blur(7px);
+  animation: rise-in 420ms ease both;
+}
+
+section:nth-child(1) {
+  animation-delay: 30ms;
+}
+
+section:nth-child(2) {
+  animation-delay: 90ms;
+}
+
+section:nth-child(3) {
+  animation-delay: 150ms;
+}
+
+section:nth-child(4) {
+  animation-delay: 210ms;
+}
+
+section:nth-child(5) {
+  animation-delay: 270ms;
 }
 
 h1,
@@ -91,16 +114,41 @@ h1 {
   font-size: clamp(1.9rem, 2.8vw, 2.5rem);
   line-height: 1.08;
   margin-bottom: 12px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
 }
 
 h2 {
   font-size: 1.15rem;
   margin-bottom: 10px;
   color: #dce9ff;
+  font-weight: 700;
 }
 
 p {
   color: var(--text-secondary);
+}
+
+.dashboard-subtitle {
+  margin: 0 0 8px;
+  color: #b8c4d4;
+  font-size: 0.95rem;
+}
+
+.brand-link-wrap {
+  margin: 0 0 12px;
+}
+
+.brand-link {
+  color: var(--accent-blue);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(88, 166, 255, 0.5);
+}
+
+.brand-link:hover {
+  color: #8fc1ff;
+  border-bottom-color: #8fc1ff;
 }
 
 #status-panel {
@@ -145,6 +193,17 @@ button {
   color: var(--text-primary);
 }
 
+input,
+select,
+textarea,
+pre,
+button,
+#current-time,
+#api-status,
+#last-run-status {
+  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", "Menlo", monospace;
+}
+
 textarea,
 pre {
   min-height: 120px;
@@ -156,6 +215,61 @@ button {
   color: #f3f8ff;
   border-color: rgba(88, 166, 255, 0.5);
   transition: transform 140ms ease, background 140ms ease, box-shadow 140ms ease;
+  font-weight: 600;
+}
+
+.action-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.action-row button {
+  margin-top: 0;
+}
+
+.tooltip-trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid var(--border-accent);
+  background: rgba(13, 17, 23, 0.8);
+  color: var(--accent-blue);
+  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", "Menlo", monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: help;
+}
+
+.tooltip-trigger::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: 210px;
+  max-width: 320px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(88, 166, 255, 0.4);
+  background: rgba(13, 17, 23, 0.96);
+  color: #d7e7ff;
+  line-height: 1.35;
+  font-size: 0.78rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+  z-index: 40;
+}
+
+.tooltip-trigger:hover::after,
+.tooltip-trigger:focus-visible::after {
+  opacity: 1;
 }
 
 button:hover {
@@ -173,6 +287,17 @@ button:active {
   margin-bottom: 8px;
   border-left: 3px solid var(--accent-blue);
   background: rgba(13, 17, 23, 0.8);
+  font-size: 0.92rem;
+}
+
+.run-item-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.run-item-row .run-item {
+  flex: 1;
 }
 
 .run-item[data-status="success"] {
@@ -200,6 +325,19 @@ pre {
   padding-right: 4px;
 }
 
+#runs-list,
+#run-log {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+#runs-list::-webkit-scrollbar,
+#run-log::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
 #cron-enabled {
   width: auto;
   margin-right: 8px;
@@ -221,5 +359,23 @@ pre {
 
   section {
     padding: 14px;
+  }
+
+  .tooltip-trigger::after {
+    left: auto;
+    right: 0;
+    top: calc(100% + 8px);
+    transform: none;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

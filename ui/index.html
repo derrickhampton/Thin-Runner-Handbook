@@ -12,6 +12,12 @@
     <main>
       <section id="status-panel">
         <h1>Thin Runner Dashboard</h1>
+        <p class="dashboard-subtitle">Workflow-first control surface for local orchestration.</p>
+        <p class="brand-link-wrap">
+          <a class="brand-link" href="https://thinrunner.com" target="_blank" rel="noopener noreferrer"
+            >thinrunner.com</a
+          >
+        </p>
         <p id="api-status">API: checking...</p>
         <p id="current-time"></p>
         <p id="last-run-status">Last run: none</p>
@@ -22,20 +28,29 @@
         <select id="skill-select"></select>
         <pre id="skill-meta"></pre>
         <textarea id="skill-input">{"name":"Dashboard"}</textarea>
-        <button id="run-skill">Run Skill</button>
+        <div class="action-row">
+          <button id="run-skill">Run Skill</button>
+          <span class="tooltip-trigger" tabindex="0" data-tooltip="Execute the selected skill using the JSON input above.">?</span>
+        </div>
         <pre id="skill-result"></pre>
       </section>
 
       <section id="runs-panel">
         <h2>Run Logs</h2>
-        <button id="refresh-runs">Refresh Runs</button>
+        <div class="action-row">
+          <button id="refresh-runs">Refresh Runs</button>
+          <span class="tooltip-trigger" tabindex="0" data-tooltip="Reload the latest run history from memory/runs.jsonl.">?</span>
+        </div>
         <div id="runs-list"></div>
         <pre id="run-log"></pre>
       </section>
 
       <section id="memory-panel">
         <h2>Memory</h2>
-        <button id="refresh-memory">Refresh Memory</button>
+        <div class="action-row">
+          <button id="refresh-memory">Refresh Memory</button>
+          <span class="tooltip-trigger" tabindex="0" data-tooltip="Reload the current memory/memory.md content.">?</span>
+        </div>
         <pre id="memory-content"></pre>
       </section>
 
@@ -47,7 +62,10 @@
           id="cron-command"
           placeholder="thin-runner run-pipeline pipelines/hello_pipeline.yaml"
         />
-        <button id="save-cron">Save Cron Schedule</button>
+        <div class="action-row">
+          <button id="save-cron">Save Cron Schedule</button>
+          <span class="tooltip-trigger" tabindex="0" data-tooltip="Validate and save only the Thin Runner managed cron block.">?</span>
+        </div>
         <pre id="cron-result"></pre>
       </section>
     </main>
