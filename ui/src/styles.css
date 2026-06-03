@@ -82,6 +82,8 @@ section {
   box-shadow: var(--shadow-lg);
   backdrop-filter: blur(7px);
   animation: rise-in 420ms ease both;
+  position: relative;
+  z-index: 1;
 }
 
 section:nth-child(1) {
@@ -264,7 +266,27 @@ button {
   opacity: 0;
   pointer-events: none;
   transition: opacity 120ms ease;
-  z-index: 40;
+  z-index: 9999;
+}
+
+#status-panel {
+  z-index: 6;
+}
+
+#skills-panel {
+  z-index: 5;
+}
+
+#runs-panel {
+  z-index: 4;
+}
+
+#memory-panel {
+  z-index: 3;
+}
+
+#cron-panel {
+  z-index: 2;
 }
 
 .tooltip-trigger:hover::after,
