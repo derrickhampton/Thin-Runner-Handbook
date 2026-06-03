@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thin Runner Dashboard</title>
+    <link rel="stylesheet" href="/ui/src/styles.css" />
+  </head>
+  <body>
+    <main>
+      <section id="status-panel">
+        <h1>Thin Runner Dashboard</h1>
+        <p id="api-status">API: checking...</p>
+        <p id="current-time"></p>
+        <p id="last-run-status">Last run: none</p>
+      </section>
+
+      <section id="skills-panel">
+        <h2>Skills</h2>
+        <select id="skill-select"></select>
+        <pre id="skill-meta"></pre>
+        <textarea id="skill-input">{"name":"Dashboard"}</textarea>
+        <button id="run-skill">Run Skill</button>
+        <pre id="skill-result"></pre>
+      </section>
+
+      <section id="runs-panel">
+        <h2>Run Logs</h2>
+        <button id="refresh-runs">Refresh Runs</button>
+        <div id="runs-list"></div>
+        <pre id="run-log"></pre>
+      </section>
+
+      <section id="memory-panel">
+        <h2>Memory</h2>
+        <button id="refresh-memory">Refresh Memory</button>
+        <pre id="memory-content"></pre>
+      </section>
+
+      <section id="cron-panel">
+        <h2>Cron Schedule</h2>
+        <label><input type="checkbox" id="cron-enabled" /> Enabled</label>
+        <input id="cron-schedule" placeholder="0 7 * * *" />
+        <input
+          id="cron-command"
+          placeholder="thin-runner run-pipeline pipelines/hello_pipeline.yaml"
+        />
+        <button id="save-cron">Save Cron Schedule</button>
+        <pre id="cron-result"></pre>
+      </section>
+    </main>
+    <script type="module" src="/ui/src/main.js"></script>
+  </body>
+</html>

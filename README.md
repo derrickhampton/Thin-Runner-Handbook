@@ -3,7 +3,7 @@
 A small, transparent workflow executor for running predefined skills and
 pipelines with explicit inputs, visible outputs, logs, and file-based memory.
 
-Website: https://ThinRunner.com
+Website: [ThinRunner.com](https://ThinRunner.com)
 
 ## What is a Thin Runner?
 
@@ -60,6 +60,26 @@ cat memory/runs.jsonl
 tail -n 40 memory/memory.md
 ls logs/
 ```
+
+## Run the local dashboard
+
+Install API dependencies and start the dashboard backend:
+
+```bash
+python -m pip install -e ".[dev,api]"
+uvicorn api.main:app --reload --host 127.0.0.1 --port 8787
+```
+
+Open <http://127.0.0.1:8787> in your browser.
+
+Dashboard features in this first version:
+
+- list registered skills from `config/skills.example.yaml`
+- execute a selected skill with JSON input
+- view latest runs from `memory/runs.jsonl`
+- open structured run logs from `logs/<run_id>.json`
+- read `memory/memory.md`
+- read/update a Thin Runner-managed cron block with command and schedule validation
 
 ## Core Components
 

@@ -1,0 +1,6 @@
+{
+  "name": "thin-runner-dashboard-ui",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Lightweight local UI for Thin Runner dashboard"
+}
