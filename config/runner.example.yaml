@@ -1,0 +1,6 @@
+runner:
+  log_level: INFO
+  logs_dir: logs
+  runs_dir: runs
+  memory_file: memory/memory.md
+  runs_file: memory/runs.jsonl

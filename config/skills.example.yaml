@@ -1,0 +1,4 @@
+skills:
+  hello_world:
+    entrypoint: skills/hello_world/run.py
+    function: run

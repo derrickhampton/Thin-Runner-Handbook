@@ -1,0 +1,19 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.DS_Store
+
+# Runtime outputs
+logs/*.log
+runs/*.json
+runs/*.jsonl
+!logs/.gitkeep
+!runs/.gitkeep
+
+# Keep base memory scaffold tracked
+!memory/memory.md
+!memory/runs.jsonl

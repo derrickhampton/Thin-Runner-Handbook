@@ -1,0 +1,6 @@
+name: hello-pipeline
+steps:
+  - name: hello_step
+    skill: hello_world
+    input:
+      name: Handbook
