@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from unittest.mock import patch
 
 from orchestrator.logging_utils import RunLogger
 from orchestrator.memory import FileMemoryStore, MemoryStore
@@ -34,22 +35,39 @@ class _FailureRegistry:
         return _fn
 
 
+_MOCK_BRAVE_POSTS = [
+    {"title": f"Post {i}", "source": f"s{i}.com", "url": f"https://s{i}.com", "description": ""}
+    for i in range(1, 4)
+]
+_MOCK_TOP_POSTS = [
+    {"rank": r, "title": f"Post {r}", "source": f"s{r}.com", "url": f"https://s{r}.com", "summary": f"Summary {r}."}
+    for r in range(1, 4)
+]
+
+
 def test_run_hello_pipeline(tmp_path: Path) -> None:
     memory = FileMemoryStore(
         memory_file=tmp_path / "memory.md",
         runs_file=tmp_path / "runs.jsonl",
     )
     registry = SkillRegistry.from_config(Path("config/skills.example.yaml"))
-    result = run_pipeline(
-        Path("pipelines/hello_pipeline.yaml"),
-        registry=registry,
-        memory_store=memory,
-        logger=_Logger(),
-    )
+    with (
+        patch("skills.hello_world.run.fetch_news_posts", return_value=_MOCK_BRAVE_POSTS),
+        patch("skills.hello_world.run.rank_and_summarize", return_value=_MOCK_TOP_POSTS),
+        patch("skills.hello_world.run.update_daily_top3"),
+    ):
+        result = run_pipeline(
+            Path("pipelines/hello_pipeline.yaml"),
+            registry=registry,
+            memory_store=memory,
+            logger=_Logger(),
+        )
 
     assert result["pipeline"] == "hello_pipeline"
     assert len(result["steps"]) == 1
-    assert result["steps"][0]["output"]["message"] == "Hello, Thin Runner Pipeline!"
+    assert result["steps"][0]["output"]["status"] == "success"
+    assert result["steps"][0]["output"]["skill"] == "hello_world"
+    assert len(result["steps"][0]["output"]["top_posts"]) == 3
 
 
 def test_thin_runner_run_skill_success(tmp_path: Path) -> None:
@@ -124,9 +142,15 @@ def test_runner_executes_hello_world_real_registry(tmp_path: Path) -> None:
     registry = SkillRegistry.from_config(Path("config/skills.example.yaml"))
     runner = ThinRunner(registry=registry, memory_store=memory, run_logger=run_logger)
 
-    result = runner.run_skill("hello_world", {"name": "Test"})
+    with (
+        patch("skills.hello_world.run.fetch_news_posts", return_value=_MOCK_BRAVE_POSTS),
+        patch("skills.hello_world.run.rank_and_summarize", return_value=_MOCK_TOP_POSTS),
+        patch("skills.hello_world.run.update_daily_top3"),
+    ):
+        result = runner.run_skill("hello_world", {"topic": "tech", "date": "2026-06-08"})
     data = result.to_dict()
 
     assert data["status"] == "success"
-    assert data["output"]["message"] == "Hello, Test!"
+    assert data["output"]["skill"] == "hello_world"
+    assert len(data["output"]["top_posts"]) == 3
     assert data["duration_ms"] >= 0

@@ -4,4 +4,6 @@ steps:
   - name: say_hello
     skill: hello_world
     input:
-      name: Thin Runner Pipeline
+      topic: social news
+      date: "2026-06-08"
+      limit: 5

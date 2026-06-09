@@ -11,10 +11,29 @@ def _write_config(path: Path, body: str) -> Path:
 
 
 def test_registry_loads_config_and_resolves_hello_world() -> None:
+    from unittest.mock import patch
+
     registry = SkillRegistry.from_config("config/skills.example.yaml")
     fn = registry.get_skill_callable("hello_world")
-    result = fn({"name": "Thin Runner"})
-    assert result["message"] == "Hello, Thin Runner!"
+
+    mock_posts = [
+        {"title": f"P{i}", "source": "s.com", "url": "https://s.com", "description": ""}
+        for i in range(1, 4)
+    ]
+    mock_top = [
+        {"rank": r, "title": f"P{r}", "source": "s.com", "url": "https://s.com", "summary": "x."}
+        for r in range(1, 4)
+    ]
+    with (
+        patch("skills.hello_world.run.fetch_news_posts", return_value=mock_posts),
+        patch("skills.hello_world.run.rank_and_summarize", return_value=mock_top),
+        patch("skills.hello_world.run.update_daily_top3"),
+    ):
+        result = fn({"topic": "tech", "date": "2026-06-08"})
+
+    assert result["status"] == "success"
+    assert result["skill"] == "hello_world"
+    assert len(result["top_posts"]) == 3
 
 
 def test_registry_raises_clear_error_for_unknown_skill() -> None:

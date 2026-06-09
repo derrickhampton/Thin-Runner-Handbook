@@ -1,4 +1,5 @@
 from pathlib import Path
+from unittest.mock import patch
 
 from orchestrator.pipeline import PipelineRunner
 from orchestrator.logging_utils import RunLogger
@@ -133,8 +134,23 @@ def test_hello_pipeline_runs_real_runner(tmp_path: Path) -> None:
     registry = SkillRegistry.from_config(Path("config/skills.example.yaml"))
     runner = ThinRunner(registry=registry, memory_store=memory, run_logger=run_logger)
 
-    result = PipelineRunner(runner=runner).run_pipeline("pipelines/hello_pipeline.yaml")
+    mock_posts = [
+        {"title": f"Post {r}", "source": f"s{r}.com", "url": f"https://s{r}.com", "description": ""}
+        for r in range(1, 4)
+    ]
+    mock_top = [
+        {"rank": r, "title": f"Post {r}", "source": f"s{r}.com", "url": f"https://s{r}.com", "summary": "x."}
+        for r in range(1, 4)
+    ]
+
+    with (
+        patch("skills.hello_world.run.fetch_news_posts", return_value=mock_posts),
+        patch("skills.hello_world.run.rank_and_summarize", return_value=mock_top),
+        patch("skills.hello_world.run.update_daily_top3"),
+    ):
+        result = PipelineRunner(runner=runner).run_pipeline("pipelines/hello_pipeline.yaml")
 
     assert result["status"] == "success"
     assert result["steps"]
     assert result["steps"][0]["output"]["status"] == "success"
+    assert len(result["steps"][0]["output"]["top_posts"]) == 3
