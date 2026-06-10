@@ -5,6 +5,8 @@ pipelines with explicit inputs, visible outputs, logs, and file-based memory.
 
 Website: [ThinRunner.com](https://ThinRunner.com)
 
+Start here: [QUICKSTART.md](QUICKSTART.md)
+
 ## What is a Thin Runner?
 
 A Thin Runner runs the right skill at the right time with the right inputs,
